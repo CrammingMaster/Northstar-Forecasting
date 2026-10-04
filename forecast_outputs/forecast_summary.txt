@@ -1,0 +1,19 @@
+NORTHSTAR FORECASTING SUMMARY
+======================================================================
+Training data end: 2022-06-02
+Holdout period: 2022-06-03 to 2022-06-30 (28 days)
+Baseline: Seasonal Naive using the value from exactly 28 days earlier
+Second model: Random Forest with leakage-safe lag/rolling/calendar features
+Metrics: MAE and WAPE
+
+NS-003 | Asia-Suez | Seasonal Naive (28-day lag) | MAE=6.214 | WAPE=23.42% | Actual total=743 | Forecast total=709.0
+NS-003 | Asia-Suez | Random Forest (recursive lags) | MAE=4.598 | WAPE=17.33% | Actual total=743 | Forecast total=659.5
+NS-033 | Regional-Europe | Seasonal Naive (28-day lag) | MAE=4.964 | WAPE=33.82% | Actual total=411 | Forecast total=482.0
+NS-033 | Regional-Europe | Random Forest (recursive lags) | MAE=4.041 | WAPE=27.53% | Actual total=411 | Forecast total=482.5
+NS-048 | Air-or-Other | Seasonal Naive (28-day lag) | MAE=7.000 | WAPE=21.01% | Actual total=933 | Forecast total=983.0
+NS-048 | Air-or-Other | Random Forest (recursive lags) | MAE=5.281 | WAPE=15.85% | Actual total=933 | Forecast total=972.4
+
+Interpretation reminder:
+Lower MAE and lower WAPE indicate lower forecast error on the held-out period.
+These forecast results measure predictive accuracy; they do not prove that route
+exposure or the Suez event caused changes in sales.
