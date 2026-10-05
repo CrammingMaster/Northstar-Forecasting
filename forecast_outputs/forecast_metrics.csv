@@ -1,7 +1,7 @@
 sku,market,channel,category,route_exposure,model,training_end,holdout_start,holdout_end,training_samples,mae,wape_percent,actual_total_units,forecast_total_units
 NS-003,France,E-commerce,Home Storage,Asia-Suez,Seasonal Naive (28-day lag),2022-06-02,2022-06-03,2022-06-30,856,6.214285714285714,23.418573351278603,743.0,709.0
-NS-003,France,E-commerce,Home Storage,Asia-Suez,Random Forest (recursive lags),2022-06-02,2022-06-03,2022-06-30,856,4.597693426974449,17.326435525610304,743.0,659.4929848243214
+NS-003,France,E-commerce,Home Storage,Asia-Suez,Random Forest (recursive lags),2022-06-02,2022-06-03,2022-06-30,856,4.597693426974449,17.326435525610304,743.0,659.4929848243216
 NS-033,France,E-commerce,Home Storage,Regional-Europe,Seasonal Naive (28-day lag),2022-06-02,2022-06-03,2022-06-30,856,4.964285714285714,33.81995133819951,411.0,482.0
 NS-033,France,E-commerce,Home Storage,Regional-Europe,Random Forest (recursive lags),2022-06-02,2022-06-03,2022-06-30,856,4.040547271943098,27.52684272856612,411.0,482.4986040631607
 NS-048,France,E-commerce,Home Storage,Air-or-Other,Seasonal Naive (28-day lag),2022-06-02,2022-06-03,2022-06-30,856,7.0,21.007502679528404,933.0,983.0
-NS-048,France,E-commerce,Home Storage,Air-or-Other,Random Forest (recursive lags),2022-06-02,2022-06-03,2022-06-30,856,5.28082800403759,15.848144063564046,933.0,972.4467956286387
+NS-048,France,E-commerce,Home Storage,Air-or-Other,Random Forest (recursive lags),2022-06-02,2022-06-03,2022-06-30,856,5.28082800403759,15.848144063564046,933.0,972.4467956286389
