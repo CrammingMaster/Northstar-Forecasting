@@ -10,6 +10,13 @@ log = {}
 log['raw_shape'] = df.shape
 
 # ------------------------------------------------------------
+# 1b. Count missing/blank values BEFORE cleaning
+# ------------------------------------------------------------
+missing_before = df.isnull().sum()
+log['missing_before_cleaning'] = missing_before.to_dict()
+log['total_missing_before_cleaning'] = int(missing_before.sum())
+
+# ------------------------------------------------------------
 # 2. Date parsing
 # ------------------------------------------------------------
 def parse_date(date_str):
@@ -114,3 +121,4 @@ with open('cleaning_log.json', 'w') as f:
 
 print("Cleaning complete. Log saved to cleaning_log.json")
 print(f"Final shape: {df.shape}")
+print(f"Total missing before cleaning: {log['total_missing_before_cleaning']}")
