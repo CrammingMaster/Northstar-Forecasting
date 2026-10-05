@@ -1,0 +1,116 @@
+import pandas as pd
+import numpy as np
+import json
+
+# ------------------------------------------------------------
+# 1. Load raw data
+# ------------------------------------------------------------
+df = pd.read_csv('northstar_daily_sku_market.csv')
+log = {}
+log['raw_shape'] = df.shape
+
+# ------------------------------------------------------------
+# 2. Date parsing
+# ------------------------------------------------------------
+def parse_date(date_str):
+    if pd.isna(date_str):
+        return pd.NaT
+    date_str = str(date_str).strip()
+    for fmt in ('%m/%d/%Y', '%Y-%m-%d', '%d-%b-%y', '%d-%b-%Y',
+                '%b-%d-%Y', '%d/%m/%Y', '%Y/%m/%d', '%d-%b-%Y',
+                '%d-%B-%y', '%d-%B-%Y'):
+        try:
+            return pd.to_datetime(date_str, format=fmt)
+        except:
+            continue
+    return pd.NaT
+
+df['date_parsed'] = df['date'].apply(parse_date)
+unparseable = df['date_parsed'].isna().sum()
+log['unparseable_dates'] = int(unparseable)
+df = df.dropna(subset=['date_parsed'])
+df['date'] = df['date_parsed']
+df = df.drop(columns=['date_parsed'])
+
+# ------------------------------------------------------------
+# 3. Standardise categorical columns
+# ------------------------------------------------------------
+df['market'] = df['market'].str.strip().str.title()
+df['channel'] = df['channel'].str.strip().str.lower()
+df['channel'] = df['channel'].replace({'e-commerce': 'E-commerce', 'stores': 'Stores'})
+for col in ['category', 'supplier_region', 'route_exposure']:
+    df[col] = df[col].str.strip().str.title()
+
+# ------------------------------------------------------------
+# 4. Handle promo_flag
+# ------------------------------------------------------------
+def parse_promo(val):
+    if pd.isna(val):
+        return np.nan
+    if isinstance(val, (int, float)):
+        return bool(val)
+    val = str(val).strip().lower()
+    if val in ['1', 'yes', 'true', 'y', 't']:
+        return True
+    elif val in ['0', 'no', 'false', 'n', 'f']:
+        return False
+    else:
+        return np.nan
+
+df['promo_flag'] = df['promo_flag'].apply(parse_promo)
+
+# ------------------------------------------------------------
+# 5. Convert numeric columns and handle invalid values
+# ------------------------------------------------------------
+numeric_cols = [
+    'unit_price_eur', 'unit_cost_eur', 'planned_marketing_spend_eur',
+    'opening_inventory_units', 'inbound_received_units', 'supplier_lead_days',
+    'transit_delay_days', 'units_sold', 'returns_units', 'cancelled_units',
+    'revenue_eur', 'holiday_flag', 'stockout_flag'
+]
+
+for col in numeric_cols:
+    df[col] = pd.to_numeric(df[col], errors='coerce')
+
+# Set impossible negatives to NaN
+for col in ['unit_price_eur', 'unit_cost_eur', 'planned_marketing_spend_eur',
+            'opening_inventory_units', 'inbound_received_units',
+            'supplier_lead_days', 'transit_delay_days', 'units_sold',
+            'returns_units', 'cancelled_units', 'revenue_eur']:
+    df.loc[df[col] < 0, col] = np.nan
+
+# ------------------------------------------------------------
+# 6. Impute missing values
+# ------------------------------------------------------------
+for col in numeric_cols:
+    if col in ['holiday_flag', 'stockout_flag']:
+        df[col] = df[col].fillna(0)
+    else:
+        median_val = df[col].median()
+        df[col] = df[col].fillna(median_val)
+
+# ------------------------------------------------------------
+# 7. Remove duplicates
+# ------------------------------------------------------------
+exact_dups = df.duplicated().sum()
+log['exact_duplicates'] = int(exact_dups)
+df = df.drop_duplicates()
+
+key_cols = ['date', 'market', 'channel', 'sku']
+key_dups = df.duplicated(subset=key_cols).sum()
+log['business_key_duplicates'] = int(key_dups)
+df = df.drop_duplicates(subset=key_cols, keep='first')
+
+# ------------------------------------------------------------
+# 8. Final checks & save
+# ------------------------------------------------------------
+log['cleaned_shape'] = df.shape
+log['missing_after_cleaning'] = df.isnull().sum().to_dict()
+
+df.to_csv('northstar_daily_sku_market_cleaned.csv', index=False)
+
+with open('cleaning_log.json', 'w') as f:
+    json.dump(log, f, indent=4, default=str)
+
+print("Cleaning complete. Log saved to cleaning_log.json")
+print(f"Final shape: {df.shape}")
